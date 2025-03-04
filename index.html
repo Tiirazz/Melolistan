@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melolistan</title>
+
+    <style>
+        html, 
+        body {
+            height: 100%;
+            margin: 0px;
+        }
+        .menu {
+            display: block; 
+            width: 100px;
+            background-color: rgb(31, 31, 31);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 5px;
+        }
+        .panel {
+            flex-grow: 1;
+            background-color: rgb(31, 31, 31);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 20px;
+            overflow-x: visible;
+            overflow-y: auto;
+        }
+        .menu-button {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            border: 0px;
+            font-size-adjust: 1;
+            background-color: rgb(48, 48, 48);
+            margin: 5px;
+            color: rgb(31, 31, 31);
+        }
+        .menu-button:hover {
+            background-color: rgb(60, 60, 60);
+        }
+        .playlist{
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 15px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(169, 169, 169, 0.248);
+        }
+    </style>
+</head>
+<body style="background-color: black; display: flex;">
+    <div class="menu"></div>
+</body>
+
+<script>
+function getEmbed(id) {
+    return `<iframe class="playlist" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/${id}?utm_source=generator&theme=0" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+}
+
+function getCollection(ids) {
+    let embeds = "";
+    for(let i in ids) {
+        embeds += getEmbed(ids[i]);
+    }
+    return `<div class="panel">${embeds}</div>`;
+}
+
+function setActive(i) {
+    const collections = document.querySelectorAll(".panel");
+    for (let j = 0; j < collections.length; j++){
+        if (i == j) collections[j].style.display = "block";
+        else collections[j].style.display = "none";
+    }
+
+    const buttons = document.querySelectorAll(".menu-button");
+    for (let j = 0; j < buttons.length; j++){
+        if (i == j) buttons[j].style.color = "white";
+        else buttons[j].style.color = "rgb(31, 31, 31)";
+    }
+}
+
+const xmlhttp = new XMLHttpRequest();
+xmlhttp.onload = function() {
+    const years = JSON.parse(this.responseText);
+    for (let i = 0; i < years.length; i++) {
+        document.querySelector(".menu").innerHTML += `<button class="menu-button" onclick=setActive(${i});>${years[i].name}</button>`;
+        document.querySelector("body").innerHTML += getCollection(years[i].playlists);
+    }
+    setActive(0);
+};
+xmlhttp.open("GET", "list.json");
+xmlhttp.send();
+
+</script>
+</html>
